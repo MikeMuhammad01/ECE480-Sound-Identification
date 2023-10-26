@@ -8,6 +8,7 @@ from python_speech_features import mfcc
 def extract_features(file_path):
     sample_rate, audio = wavfile.read(file_path)
     features = mfcc(audio, sample_rate)
+    print(features)
     return features
 
 def compute_similarity(features1, features2):
