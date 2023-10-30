@@ -1,62 +1,154 @@
 import tkinter as tk
 from tkinter import font
-from match import record_audio, match_recording, recording_duration, recording_file_path, folder_path
+from threading import Thread
+import time
+# from match import record_audio, match_recording, recording_duration, recording_file_path, folder_path, calculate_dB_level
 
-def update_result():
-    record_audio(recording_file_path, recording_duration)
-    most_similar_file = match_recording(recording_file_path, folder_path)
-    # Display the result on the GUI
-    result_label.config(text='Most similar wav: ' + most_similar_file)
-    
-    if running:  # Only reschedule if still running
-        # Schedule next update after 3 seconds (3000 milliseconds)
-        global after_id
-        after_id = root.after(3000, update_result)
+# Dummy implementation of audio-related functions for testing
+def record_audio(file_path, duration):
+    pass
 
+def match_recording(file_path, folder_path):
+    return "dummy.wav"
+
+recording_duration = 3
+recording_file_path = "test.wav"
+folder_path = "./audio_files"
+
+def calculate_dB_level_from_file(file_path):
+    import random
+    return random.uniform(50, 100)
+
+# Define a Thread class to handle audio processing in the background
+class AudioProcessingThread(Thread):
+    def __init__(self, update_ui_callback):
+        Thread.__init__(self)
+        self.update_ui_callback = update_ui_callback  # Function to call for updating the UI
+        self.running = False  # Variable to control the running state of the thread
+
+    def run(self):
+        while True:  # Infinite loop to keep the thread running
+            if self.running:
+                # If the thread is in the running state, record audio and find the most similar file
+                record_audio(recording_file_path, recording_duration)
+                most_similar_file = match_recording(recording_file_path, folder_path)
+                self.update_ui_callback(most_similar_file)  # Update the UI with the result
+                time.sleep(3)  # Wait for 3 seconds before the next iteration
+            else:
+                time.sleep(0.1)  # Short sleep to prevent high CPU usage when not recording
+
+    def start_recording(self):
+        self.running = True  # Start the audio processing
+
+    def stop_recording(self):
+        self.running = False  # Stop the audio processing
+
+# Global variable to store the previous dB level
+previous_dB_level = None
+
+# Function to update the UI with the most similar file and dB level (if enabled)
+def update_ui(most_similar_file):
+    global previous_dB_level
+    result_label.config(text='Most similar wav: ' + most_similar_file)  # Update the label with the result
+    if show_dB.get():
+        dB_level = calculate_dB_level_from_file(recording_file_path)  # Calculate the dB level
+        dB_label.config(text=f'dB Level: {dB_level:.2f} dB')  # Update the dB level label
+        update_big_circles(dB_level)  # Update the big circles' colors based on the dB level
+    else:
+        dB_label.config(text='')  # Clear the dB level label if disabled
+
+def update_big_circles(current_dB_level):
+    global previous_dB_level
+    if previous_dB_level is not None:
+        if current_dB_level > previous_dB_level:
+            left_circle.itemconfig(left_semi_circle, fill="red")
+            right_circle.itemconfig(right_semi_circle, fill="red")
+        elif current_dB_level < previous_dB_level:
+            left_circle.itemconfig(left_semi_circle, fill="green")
+            right_circle.itemconfig(right_semi_circle, fill="green")
+    previous_dB_level = current_dB_level
+
+# Function to handle button press events
 def on_circle_press(event):
     global running
     if not running:
+        # If not currently recording, start recording and update the UI
         circle.itemconfig(button_circle, fill="green")
+        circle.itemconfig(button_text, text="Recording", fill="white")
+        audio_thread.start_recording()
         running = True
-        root.after(0, update_result)  # Start the process after changing the button color
     else:
+        # If currently recording, stop recording and update the UI
         circle.itemconfig(button_circle, fill="red")
+        circle.itemconfig(button_text, text="Record", fill="black")
+        audio_thread.stop_recording()
         running = False
-        if after_id:
-            root.after_cancel(after_id)  # Use the after_id to cancel the scheduled function
 
+# Create the main window
 root = tk.Tk()
 root.title("Sound Identification")
 root.geometry("1000x600")
 
-# Define fonts
+# Define various fonts for use in the UI
 large_font = font.Font(size=15)
 very_large_font = font.Font(size=20)
 title_font = font.Font(size=24, weight='bold')
 
+# Create a frame to hold the UI elements
 frame = tk.Frame(root, padx=40, pady=40)
-frame.pack(padx=20, pady=20)
+frame.pack(padx=20, pady=20, expand=True)
 
+# Create and pack the title label
 title_label = tk.Label(frame, text="Sound Identification", font=title_font)
 title_label.pack(pady=15)
 
-# Create a canvas for the circle button
+# Create and pack the canvas for the recording button
 circle = tk.Canvas(frame, width=100, height=100, bg='white', highlightthickness=0)
 circle.pack(pady=30)
 
-# Draw a circle on the canvas and set its initial color to red
+# Draw a red circle and text "Record" on the canvas
 button_circle = circle.create_oval(10, 10, 90, 90, fill="red")
+button_text = circle.create_text(50, 50, text="Record", font=("Arial", 12), fill="black")
+circle.tag_bind(button_circle, '<Button-1>', on_circle_press)  # Bind button press event to the circle
+circle.tag_bind(button_text, '<Button-1>', on_circle_press)  # Bind button press event to the text
 
-# Bind the circle to the function on_circle_press
-circle.tag_bind(button_circle, '<Button-1>', on_circle_press)  
-
+# Create and pack the label for displaying the most similar file
 result_label = tk.Label(frame, text="", font=very_large_font)
 result_label.pack(pady=30)
 
-running = False  # Variable to keep track of the running state
-after_id = None  # Variable to store the ID returned by root.after() 
+# Create and pack the label for displaying the dB level
+dB_label = tk.Label(frame, text="dB Level: ", font=large_font)
+dB_label.pack(pady=10)
+
+# Create the canvas for the left semi-circle
+left_circle = tk.Canvas(root, width=300, height=600, bg='white', highlightthickness=0)
+left_circle.place(x=0, y=300, anchor='w')
+
+# Create a semi-circle on the left canvas (default color is grey)
+left_semi_circle = left_circle.create_arc(10, 50, 290, 550, start=90, extent=180, fill="grey", outline="")
+
+# Create the canvas for the right semi-circle
+right_circle = tk.Canvas(root, width=300, height=600, bg='white', highlightthickness=0)
+right_circle.place(x=1000, y=300, anchor='e')
+
+# Create a semi-circle on the right canvas (default color is grey)
+right_semi_circle = right_circle.create_arc(10, 50, 290, 550, start=-90, extent=180, fill="grey", outline="")
+
+# Create and place the settings button
+settings_button = tk.Menubutton(root, text="☰", font=("Arial", 15), relief=tk.FLAT)
+settings_button.place(x=10, y=10)
+
+# Create the settings menu with a checkbutton to show/hide dB level
+settings_menu = tk.Menu(settings_button, tearoff=0)
+settings_button["menu"] = settings_menu
+show_dB = tk.BooleanVar()
+show_dB.set(True)  # dB level is shown by default
+settings_menu.add_checkbutton(label="Show dB Level", onvalue=True, offvalue=False, variable=show_dB)
+
+# Initialize the running state and start the audio processing thread
+running = False
+audio_thread = AudioProcessingThread(update_ui)
+audio_thread.start()
+
+# Start the main loop of the application
 root.mainloop()
-
-
-
-

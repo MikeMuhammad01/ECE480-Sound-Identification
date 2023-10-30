@@ -8,7 +8,6 @@ from python_speech_features import mfcc
 def extract_features(file_path):
     sample_rate, audio = wavfile.read(file_path)
     features = mfcc(audio, sample_rate)
-    print(features)
     return features
 
 def compute_similarity(features1, features2):
@@ -40,18 +39,15 @@ def record_audio(file_path, duration):
     sd.wait()
     wavfile.write(file_path, fs, audio)
 
+def calculate_dB_level(audio_data):
+    amplitude = np.max(np.abs(audio_data))
+    if amplitude > 0:
+        dB_level = 20 * np.log10(amplitude)
+        return dB_level
+    else:
+        return -np.inf
 
 recording_duration = 5
-
-
 recording_file_path = 'recording.wav'
-
-
 folder_path = '\Sounds'
 
-
-record_audio(recording_file_path, recording_duration)
-
-
-most_similar_file = match_recording(recording_file_path, folder_path)
-print('most similar wav:', most_similar_file)
