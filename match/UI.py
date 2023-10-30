@@ -1,23 +1,8 @@
 import tkinter as tk
-from tkinter import font
+from tkinter import font, Menu
 from threading import Thread
 import time
-# from match import record_audio, match_recording, recording_duration, recording_file_path, folder_path, calculate_dB_level
-
-# Dummy implementation of audio-related functions for testing
-def record_audio(file_path, duration):
-    pass
-
-def match_recording(file_path, folder_path):
-    return "dummy.wav"
-
-recording_duration = 3
-recording_file_path = "test.wav"
-folder_path = "./audio_files"
-
-def calculate_dB_level_from_file(file_path):
-    import random
-    return random.uniform(50, 100)
+from match import record_audio, match_recording, recording_duration, recording_file_path, folder_path, calculate_dB_level
 
 # Define a Thread class to handle audio processing in the background
 class AudioProcessingThread(Thread):
@@ -43,30 +28,20 @@ class AudioProcessingThread(Thread):
     def stop_recording(self):
         self.running = False  # Stop the audio processing
 
-# Global variable to store the previous dB level
-previous_dB_level = None
+# Function to calculate the dB level from an audio file
+def calculate_dB_level_from_file(file_path):
+    # Implement the logic to calculate dB level from audio file
+    # This is a placeholder implementation
+    return 0
 
 # Function to update the UI with the most similar file and dB level (if enabled)
 def update_ui(most_similar_file):
-    global previous_dB_level
     result_label.config(text='Most similar wav: ' + most_similar_file)  # Update the label with the result
     if show_dB.get():
         dB_level = calculate_dB_level_from_file(recording_file_path)  # Calculate the dB level
         dB_label.config(text=f'dB Level: {dB_level:.2f} dB')  # Update the dB level label
-        update_big_circles(dB_level)  # Update the big circles' colors based on the dB level
     else:
         dB_label.config(text='')  # Clear the dB level label if disabled
-
-def update_big_circles(current_dB_level):
-    global previous_dB_level
-    if previous_dB_level is not None:
-        if current_dB_level > previous_dB_level:
-            left_circle.itemconfig(left_semi_circle, fill="red")
-            right_circle.itemconfig(right_semi_circle, fill="red")
-        elif current_dB_level < previous_dB_level:
-            left_circle.itemconfig(left_semi_circle, fill="green")
-            right_circle.itemconfig(right_semi_circle, fill="green")
-    previous_dB_level = current_dB_level
 
 # Function to handle button press events
 def on_circle_press(event):
@@ -96,7 +71,7 @@ title_font = font.Font(size=24, weight='bold')
 
 # Create a frame to hold the UI elements
 frame = tk.Frame(root, padx=40, pady=40)
-frame.pack(padx=20, pady=20, expand=True)
+frame.pack(padx=20, pady=20)
 
 # Create and pack the title label
 title_label = tk.Label(frame, text="Sound Identification", font=title_font)
@@ -119,20 +94,6 @@ result_label.pack(pady=30)
 # Create and pack the label for displaying the dB level
 dB_label = tk.Label(frame, text="dB Level: ", font=large_font)
 dB_label.pack(pady=10)
-
-# Create the canvas for the left semi-circle
-left_circle = tk.Canvas(root, width=300, height=600, bg='white', highlightthickness=0)
-left_circle.place(x=0, y=300, anchor='w')
-
-# Create a semi-circle on the left canvas (default color is grey)
-left_semi_circle = left_circle.create_arc(10, 50, 290, 550, start=90, extent=180, fill="grey", outline="")
-
-# Create the canvas for the right semi-circle
-right_circle = tk.Canvas(root, width=300, height=600, bg='white', highlightthickness=0)
-right_circle.place(x=1000, y=300, anchor='e')
-
-# Create a semi-circle on the right canvas (default color is grey)
-right_semi_circle = right_circle.create_arc(10, 50, 290, 550, start=-90, extent=180, fill="grey", outline="")
 
 # Create and place the settings button
 settings_button = tk.Menubutton(root, text="☰", font=("Arial", 15), relief=tk.FLAT)
