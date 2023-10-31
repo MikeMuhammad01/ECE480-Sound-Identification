@@ -55,5 +55,5 @@ def calculate_dB_level(audio_data_or_file_path):
 
 recording_duration = 5
 recording_file_path = 'recording.wav'
-folder_path = '\Sounds'
+folder_path = 'Sounds/'
 
