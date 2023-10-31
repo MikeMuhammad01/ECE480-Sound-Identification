@@ -1,23 +1,34 @@
+import math
 import os
+
+import librosa
 import numpy as np
 import sounddevice as sd
+
+from dtw import dtw
+from librosa.feature import mfcc
 from scipy.io import wavfile
-from scipy.spatial.distance import cdist
-from python_speech_features import mfcc
+#from scipy.spatial.distance import cdist
+#from python_speech_features import mfcc
 
 def extract_features(file_path):
-    sample_rate, audio = wavfile.read(file_path)
-    features = mfcc(audio, sample_rate)
+#    sample_rate, audio = wavfile.read(file_path)
+    audio, fs = librosa.load(file_path)
+    features = mfcc(y=audio, sr=fs)  # Computing MFCC values
+#    features = mfcc(audio, sample_rate)
     return features
 
+
 def compute_similarity(features1, features2):
-    distance_matrix = cdist(features1, features2, metric='euclidean')
-    similarity = np.mean(distance_matrix)
-    return similarity
+    print(dtw(x=features1.T, y=features2.T, dist=math.dist)[0])
+#    distance_matrix = cdist(features1, features2, metric='euclidean')
+#    similarity = np.mean(distance_matrix)
+    return dtw(x=features1.T, y=features2.T, dist=math.dist)[0]
+
 
 def match_recording(recording_path, folder_path):
     recording_features = extract_features(recording_path)
-    max_similarity = float('-inf')
+    max_similarity = float('inf')
     most_similar_file = None
 
     for file_name in os.listdir(folder_path):
@@ -26,11 +37,12 @@ def match_recording(recording_path, folder_path):
             file_features = extract_features(file_path)
             similarity = compute_similarity(recording_features, file_features)
 
-            if similarity > max_similarity:
+            if similarity < max_similarity:
                 max_similarity = similarity
                 most_similar_file = file_name
 
     return most_similar_file
+
 
 def record_audio(file_path, duration):
     fs = 44100  
@@ -38,6 +50,7 @@ def record_audio(file_path, duration):
     audio = sd.rec(int(duration * fs), samplerate=fs, channels=1)
     sd.wait()
     wavfile.write(file_path, fs, audio)
+
 
 def calculate_dB_level(audio_data_or_file_path):
     if isinstance(audio_data_or_file_path, str):  # if it's a file path
