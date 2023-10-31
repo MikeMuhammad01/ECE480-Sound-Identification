@@ -30,9 +30,7 @@ class AudioProcessingThread(Thread):
 
 # Function to calculate the dB level from an audio file
 def calculate_dB_level_from_file(file_path):
-    # Implement the logic to calculate dB level from audio file
-    # This is a placeholder implementation
-    return 0
+    return calculate_dB_level(file_path)
 
 # Function to update the UI with the most similar file and dB level (if enabled)
 def update_ui(most_similar_file):

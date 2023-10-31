@@ -17,7 +17,7 @@ def compute_similarity(features1, features2):
 
 def match_recording(recording_path, folder_path):
     recording_features = extract_features(recording_path)
-    max_similarity = float('inf')
+    max_similarity = float('-inf')
     most_similar_file = None
 
     for file_name in os.listdir(folder_path):
@@ -26,7 +26,7 @@ def match_recording(recording_path, folder_path):
             file_features = extract_features(file_path)
             similarity = compute_similarity(recording_features, file_features)
 
-            if similarity < max_similarity:
+            if similarity > max_similarity:
                 max_similarity = similarity
                 most_similar_file = file_name
 
@@ -39,13 +39,19 @@ def record_audio(file_path, duration):
     sd.wait()
     wavfile.write(file_path, fs, audio)
 
-def calculate_dB_level(audio_data):
+def calculate_dB_level(audio_data_or_file_path):
+    if isinstance(audio_data_or_file_path, str):  # if it's a file path
+        sample_rate, audio_data = wavfile.read(audio_data_or_file_path)
+    else:  # assuming it's a numpy array
+        audio_data = audio_data_or_file_path
+
     amplitude = np.max(np.abs(audio_data))
     if amplitude > 0:
         dB_level = 20 * np.log10(amplitude)
         return dB_level
     else:
         return -np.inf
+
 
 recording_duration = 5
 recording_file_path = 'recording.wav'
