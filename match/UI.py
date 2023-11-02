@@ -8,8 +8,7 @@ import numpy as np
 from match import record_audio, match_recording, \
     recording_duration, recording_file_path
 
-from doppler_effect import dB_level, dB_level_2, \
-    calculate_dB_level, position_to_sound
+from doppler_effect import calculate_dB_level
 
 
 # Define a Thread class to handle audio processing in the background
@@ -45,11 +44,11 @@ def update_ui(most_similar_file):
 
     if show_dB.get():
         # Show the dB level on the UI
-        calculate_dB_level(recording_file_path)  # Calculate the dB level
+        dB_level, position_to_sound = calculate_dB_level(recording_file_path)  # Calculate the dB level
         dB_label.config(text=f'dB Level: {dB_level:.2f} dB')  # Update the dB level label
 
         # Make the UI display whether the sound is closer or further
-        if dB_level_2 is not None and dB_level != -np.inf:
+        if position_to_sound != '':
             dB_comparison.config(text=f'You are: ' + position_to_sound)  # Update the dB level label
 
     else:
