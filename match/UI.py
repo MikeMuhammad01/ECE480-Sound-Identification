@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import font, Menu
 from threading import Thread
 import time
-from match import record_audio, match_recording, recording_duration, recording_file_path, folder_path, calculate_dB_level
+from match import record_audio, match_recording, recording_duration, \
+    recording_file_path, calculate_dB_level
 
 # Define a Thread class to handle audio processing in the background
 class AudioProcessingThread(Thread):
@@ -16,7 +17,7 @@ class AudioProcessingThread(Thread):
             if self.running:
                 # If the thread is in the running state, record audio and find the most similar file
                 record_audio(recording_file_path, recording_duration)
-                most_similar_file = match_recording(recording_file_path, folder_path)
+                most_similar_file = match_recording(recording_file_path)
                 self.update_ui_callback(most_similar_file)  # Update the UI with the result
                 time.sleep(3)  # Wait for 3 seconds before the next iteration
             else:
@@ -56,6 +57,7 @@ def on_circle_press(event):
         circle.itemconfig(button_text, text="Record", fill="black")
         audio_thread.stop_recording()
         running = False
+
 
 # Create the main window
 root = tk.Tk()

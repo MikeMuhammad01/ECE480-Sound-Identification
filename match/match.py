@@ -8,32 +8,34 @@ import sounddevice as sd
 from dtw import dtw
 from librosa.feature import mfcc
 from scipy.io import wavfile
-#from scipy.spatial.distance import cdist
-#from python_speech_features import mfcc
+from scipy.signal import find_peaks
+from scipy.fft import fft
+
 
 def extract_features(file_path):
-#    sample_rate, audio = wavfile.read(file_path)
+
     audio, fs = librosa.load(file_path)
-    features = mfcc(y=audio, sr=fs)  # Computing MFCC values
-#    features = mfcc(audio, sample_rate)
-    return features
+    fft_audio = fft(audio)
+    peaks = find_peaks(fft_audio, distance=int(fs/5))
+
+    # Computing MFCC values
+#    features.append(np.max(mfcc(y=audio, sr=fs)))
+#    features.append(np.min(mfcc(y=audio, sr=fs)))
+    return peaks[0]
 
 
 def compute_similarity(features1, features2):
-    print(dtw(x=features1.T, y=features2.T, dist=math.dist)[0])
-#    distance_matrix = cdist(features1, features2, metric='euclidean')
-#    similarity = np.mean(distance_matrix)
-    return dtw(x=features1.T, y=features2.T, dist=math.dist)[0]
+    return math.dist(features1, features2)
 
 
-def match_recording(recording_path, folder_path):
+def match_recording(recording_path):
     recording_features = extract_features(recording_path)
     max_similarity = float('inf')
     most_similar_file = None
 
-    for file_name in os.listdir(folder_path):
+    for file_name in os.listdir(repository_path):
         if file_name.endswith('.wav'):
-            file_path = os.path.join(folder_path, file_name)
+            file_path = os.path.join(repository_path, file_name)
             file_features = extract_features(file_path)
             similarity = compute_similarity(recording_features, file_features)
 
@@ -68,5 +70,5 @@ def calculate_dB_level(audio_data_or_file_path):
 
 recording_duration = 5
 recording_file_path = 'recording.wav'
-folder_path = 'Sounds/'
+repository_path = 'Sounds/'
 
