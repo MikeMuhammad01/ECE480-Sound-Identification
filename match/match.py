@@ -13,19 +13,14 @@ from scipy.fft import fft
 
 
 def extract_features(file_path):
-
     audio, fs = librosa.load(file_path)
-    fft_audio = fft(audio)
-    peaks = find_peaks(fft_audio, distance=int(fs/5))
 
-    # Computing MFCC values
-#    features.append(np.max(mfcc(y=audio, sr=fs)))
-#    features.append(np.min(mfcc(y=audio, sr=fs)))
-    return peaks[0]
+    # Computing & returning MFCC values
+    return mfcc(y=audio, sr=fs)
 
 
 def compute_similarity(features1, features2):
-    return math.dist(features1, features2)
+    return dtw(x=features1.T, y=features2.T, dist=math.dist)[0]
 
 
 def match_recording(recording_path):
@@ -41,7 +36,7 @@ def match_recording(recording_path):
 
             if similarity < max_similarity:
                 max_similarity = similarity
-                most_similar_file = file_name
+                most_similar_file = file_name.replace('.wav', '')
 
     return most_similar_file
 

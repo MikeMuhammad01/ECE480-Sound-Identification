@@ -5,6 +5,7 @@ import time
 from match import record_audio, match_recording, recording_duration, \
     recording_file_path, calculate_dB_level
 
+
 # Define a Thread class to handle audio processing in the background
 class AudioProcessingThread(Thread):
     def __init__(self, update_ui_callback):
