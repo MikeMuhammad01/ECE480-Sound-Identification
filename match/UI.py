@@ -1,9 +1,15 @@
 import tkinter as tk
-from tkinter import font, Menu
+from tkinter import font
 from threading import Thread
 import time
-from match import record_audio, match_recording, recording_duration, \
-    recording_file_path, calculate_dB_level
+
+import numpy as np
+
+from match import record_audio, match_recording, \
+    recording_duration, recording_file_path
+
+from doppler_effect import dB_level, dB_level_2, \
+    calculate_dB_level, position_to_sound
 
 
 # Define a Thread class to handle audio processing in the background
@@ -20,7 +26,7 @@ class AudioProcessingThread(Thread):
                 record_audio(recording_file_path, recording_duration)
                 most_similar_file = match_recording(recording_file_path)
                 self.update_ui_callback(most_similar_file)  # Update the UI with the result
-                time.sleep(3)  # Wait for 3 seconds before the next iteration
+                time.sleep(0.5)  # Wait a half a second before the next iteration
             else:
                 time.sleep(0.1)  # Short sleep to prevent high CPU usage when not recording
 
@@ -30,18 +36,26 @@ class AudioProcessingThread(Thread):
     def stop_recording(self):
         self.running = False  # Stop the audio processing
 
-# Function to calculate the dB level from an audio file
-def calculate_dB_level_from_file(file_path):
-    return calculate_dB_level(file_path)
 
 # Function to update the UI with the most similar file and dB level (if enabled)
 def update_ui(most_similar_file):
-    result_label.config(text='Most similar wav: ' + most_similar_file)  # Update the label with the result
+
+    # Update the UI to show most similar file
+    result_label.config(text=most_similar_file + f' is being heard')  # Update the label with the result
+
     if show_dB.get():
-        dB_level = calculate_dB_level_from_file(recording_file_path)  # Calculate the dB level
+        # Show the dB level on the UI
+        calculate_dB_level(recording_file_path)  # Calculate the dB level
         dB_label.config(text=f'dB Level: {dB_level:.2f} dB')  # Update the dB level label
+
+        # Make the UI display whether the sound is closer or further
+        if dB_level_2 is not None and dB_level != -np.inf:
+            dB_comparison.config(text=f'You are: ' + position_to_sound)  # Update the dB level label
+
     else:
         dB_label.config(text='')  # Clear the dB level label if disabled
+        dB_comparison.config(text='')  # Clear the label if disabled
+
 
 # Function to handle button press events
 def on_circle_press(event):
@@ -95,6 +109,10 @@ result_label.pack(pady=30)
 # Create and pack the label for displaying the dB level
 dB_label = tk.Label(frame, text="dB Level: ", font=large_font)
 dB_label.pack(pady=10)
+
+# Create and pack the label for displaying the closeness of a sound
+dB_comparison = tk.Label(frame, text="", font=large_font)
+dB_comparison.pack(pady=10)
 
 # Create and place the settings button
 settings_button = tk.Menubutton(root, text="☰", font=("Arial", 15), relief=tk.FLAT)
