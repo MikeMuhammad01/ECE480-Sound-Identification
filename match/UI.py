@@ -3,8 +3,6 @@ from tkinter import font
 from threading import Thread
 import time
 
-import numpy as np
-
 from match import record_audio, match_recording, \
     recording_duration, recording_file_path
 
@@ -42,8 +40,8 @@ def update_ui(most_similar_file):
     # Update the UI to show most similar file
     result_label.config(text=most_similar_file + f' is being heard')  # Update the label with the result
 
+    # Show the dB level on the UI
     if show_dB.get():
-        # Show the dB level on the UI
         dB_level, position_to_sound = calculate_dB_level(recording_file_path)  # Calculate the dB level
         dB_label.config(text=f'dB Level: {dB_level:.2f} dB')  # Update the dB level label
 

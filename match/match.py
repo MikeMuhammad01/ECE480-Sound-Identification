@@ -2,7 +2,6 @@ import math
 import os
 
 import librosa
-import numpy as np
 import sounddevice as sd
 
 from dtw import dtw
@@ -12,8 +11,6 @@ from scipy.io import wavfile
 
 def extract_features(file_path):
     audio, fs = librosa.load(file_path)
-
-
     return mfcc(y=audio, sr=fs)
 
 
