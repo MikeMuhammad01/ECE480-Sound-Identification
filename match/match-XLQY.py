@@ -1,6 +1,7 @@
 import os, io
 import warnings
 import numpy as np
+import sounddevice as sd
 import soundfile as sf
 from fastdtw import fastdtw
 from scipy.io import wavfile
@@ -34,9 +35,16 @@ def match_recording(record_path, folder_path):
             if similarity > max_similarity:
                 max_similarity = similarity
                 most_similar_file = file_name
-
     return most_similar_file
 
+""""
+def record_audio(file_path, duration):
+    fs = 44100  
+    print("recording...")
+    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+    sd.wait()
+    wavfile.write(file_path, fs, audio)
+"""
 def calculate_dB_level(audio_data_or_file_path):
     if isinstance(audio_data_or_file_path, str):  # if it's a file path
         sample_rate, audio_data = wavfile.read(audio_data_or_file_path)
