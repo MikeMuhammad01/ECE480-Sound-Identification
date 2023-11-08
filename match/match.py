@@ -3,6 +3,7 @@ import os
 
 import librosa
 import sounddevice as sd
+import noisereduce as nr
 
 from dtw import dtw
 from librosa.feature import mfcc
@@ -11,6 +12,7 @@ from scipy.io import wavfile
 
 def extract_features(file_path):
     audio, fs = librosa.load(file_path)
+    audio = nr.reduce_noise(y=audio, sr=fs)
     return mfcc(y=audio, sr=fs)
 
 
