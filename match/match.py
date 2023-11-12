@@ -13,6 +13,7 @@ from scipy.io import wavfile
 def extract_features(file_path):
     audio, fs = librosa.load(file_path)
     audio = nr.reduce_noise(y=audio, sr=fs)
+    print("Hi")
     return mfcc(y=audio, sr=fs)
 
 
