@@ -15,6 +15,7 @@
             Excellence Green:   #0B9A6D
             Refresh Green:      #008934
         */
+
         body {
             margin: 0;
             padding: 0;
@@ -61,12 +62,12 @@
             width: 100px; /* Fixed width */
             height: 100px; /* Fixed height */
             border-radius: 50%; /* Make it a circle */
-            background-color: #007bff; /* Background color */
+            color: #fff; /* Text color */
+            background-color: #18453B; /* Background color */
             text-align: center; /* Center text horizontally */
             display: flex; /* Use flexbox for layout */
             align-items: center; /* Center-align items vertically */
             justify-content: center; /* Center content horizontally */
-            color: #fff; /* Text color */
             font-size: 20px; /* Text size */
             cursor: pointer; /* Change mouse cursor to pointer */
         }
@@ -112,8 +113,6 @@
           background-color: #008208;
         }
 
-
-
         /* Style the collapsible content. Note: hidden by default */
         .content {
           padding: 0 18px;
@@ -121,6 +120,7 @@
           max-height: 0;
           overflow: hidden;
           transition: max-height 0.2s ease-out;
+          color: #18453b
         }
     </style>
 </head>
@@ -132,12 +132,9 @@
     <div id="button" onclick="startFunc()">Record</div>
     <!-- Button that stops audio recording, initially hidden -->
     <div id="button2" style="display: none;" onclick="stopFunc()">Stop Record</div>
-    <!-- Div that will display the result of the sound analysis -->
-    <div id="result">Result</div>
     <button type="button" class="collapsible">Sound Identification Results</button>
-    <div class="content">
-      <p>Lorem ipsum...</p>
-    </div>
+    <!-- Div that will display the result of the sound analysis -->
+    <div class="content" id ="soundIdentificationResults"></div>
 
     <!-- JavaScript files required for recording functionality -->
     <script src="/static/js/recorder-core.js"></script>
@@ -313,7 +310,7 @@
             // Showing the "Stop Record" button by clearing any inline display style, defaults to 'flex' from the stylesheet
             document.getElementById('button2').style = "";
             // Displaying a message to the user that the system is analyzing the sound
-            displayResult("Analysing...")
+            displayResult("Analyzing...")
         }
 
         // This function is called when the user clicks the "Stop Record" button.
@@ -340,7 +337,10 @@
         // This function updates the text content of the 'result' div to display messages to the user
         function displayResult(result) {
             // Setting the text content of the 'result' div to whatever result is passed to the function
-            document.getElementById('result').textContent = result;
+            document.getElementById('soundIdentificationResults').innerHTML = result;
+
+            // Automatically open the collapsible when sound is detected
+            document.querySelector('.collapsible').click();
         }
 
         // A utility function to format milliseconds into a human-readable string
