@@ -89,7 +89,7 @@
           color: #FFFFFF;
           cursor: pointer;
           padding: 18px;
-          width: 100%;
+          width: 75%;
           border: none;
           text-align: center;
           outline: none;
@@ -122,6 +122,7 @@
           overflow: hidden;
           transition: max-height 0.2s ease-out;
         }
+
     </style>
 </head>
 
@@ -134,7 +135,12 @@
     <div id="button2" style="display: none;" onclick="stopFunc()">Stop Record</div>
     <button type="button" class="collapsible">Sound Identification Results</button>
     <!-- Div that will display the result of the sound analysis -->
-    <div class="content" id ="soundIdentificationResults"></div>
+    <div class="content" id="soundIdentificationResults">
+        <p id="soundIdentified"></p>
+        <p id ="decibelLevel"></p>
+        <p id ="location"></p>
+    </div>
+
 
     <!-- JavaScript files required for recording functionality -->
     <script src="/static/js/recorder-core.js"></script>
@@ -156,9 +162,9 @@
             // Create a new recorder instance with specified settings
             var newRec = Recorder({
                 // Output format
-                type: "wav", 
+                type: "wav",
                 // Sample rate for recording
-                sampleRate: 16000, 
+                sampleRate: 16000,
                 // Bit rate for recording
                 bitRate: 16,
                 //Recording real-time callback, called approximately 12 times per second
@@ -337,10 +343,24 @@
         // This function updates the text content of the 'result' div to display messages to the user
         function displayResult(result) {
             // Setting the text content of the 'result' div to whatever result is passed to the function
-            document.getElementById('soundIdentificationResults').innerHTML = result;
+            let result2 = result.slice(1,-2)
+            result2 = result2.replace(/"/g,"")
+            let result3 = result2.split(',')
+            if (!(result == "Analyzing...")) {
+                document.getElementById('soundIdentified').innerHTML = "Sound Identified: " + result3[0];
+                document.getElementById('decibelLevel').innerHTML = "Decibel Level: " + result3[1]+" dB";
+                document.getElementById('location').innerHTML = "Relative Location: " + result3[2];
+            } else {
+                document.getElementById('soundIdentified').innerHTML = result;
+                document.getElementById('decibelLevel').innerHTML = "N/A";
+                document.getElementById('location').innerHTML = "N/A";
+            }
 
             // Automatically open the collapsible when sound is detected
-            document.querySelector('.collapsible').click();
+            var collapsible = document.querySelector('.collapsible');
+            if (!collapsible.classList.contains('active')) {
+                collapsible.click();
+            }
         }
 
         // A utility function to format milliseconds into a human-readable string
@@ -374,6 +394,4 @@
         }
     </script>
 </body>
-
-
 </html>
