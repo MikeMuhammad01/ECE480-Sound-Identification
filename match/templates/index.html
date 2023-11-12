@@ -5,6 +5,16 @@
     <meta charset="UTF-8"> <!-- Sets the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures the site is mobile-friendly -->
     <style>
+        /*
+            MSU Hex Code Colors:
+            Spartan Green:      #18453B
+            White:              #FFFFFF
+            Black:              #000000
+            Kelly Green:        #008208
+            Lime Green:         #7BBD00
+            Excellence Green:   #0B9A6D
+            Refresh Green:      #008934
+        */
         body {
             margin: 0;
             padding: 0;
@@ -68,18 +78,63 @@
             max-width: 100%;
             height: auto;
         }
+
+        /* Style the button that is used to open and close the collapsible content */
+        .collapsible {
+          background-color: #eee;
+          color: #444;
+          cursor: pointer;
+          padding: 18px;
+          width: 100%;
+          border: none;
+          text-align: center;
+          outline: none;
+          font-size: 15px;
+        }
+
+        .collapsible:after {
+          content: '\0FF3E'; /* Unicode character for "caret" sign (^) */
+          font-size: 13px;
+          color: black;
+          float: center;
+          margin-left: 5px;
+        }
+
+        .active:after {
+          content: "\2796"; /* Unicode character for "minus" sign (-) */
+        }
+
+        /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+        .active, .collapsible:hover {
+          background-color: #ccc;
+        }
+
+
+
+        /* Style the collapsible content. Note: hidden by default */
+        .content {
+          padding: 0 18px;
+          background-color: white;
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.2s ease-out;
+        }
     </style>
 </head>
 
 <body>
     <!-- Title div displaying the name of the application -->
-    <div id="title">Sound Identification</div>
+    <div id="title">MSU RCPD Sound Identification System</div>
     <!-- Button that initiates audio recording -->
     <div id="button" onclick="startFunc()">Record</div>
     <!-- Button that stops audio recording, initially hidden -->
     <div id="button2" style="display: none;" onclick="stopFunc()">Stop Record</div>
     <!-- Div that will display the result of the sound analysis -->
     <div id="result">Result</div>
+    <button type="button" class="collapsible">Open Collapsible</button>
+    <div class="content">
+      <p>Lorem ipsum...</p>
+    </div>
 
     <!-- JavaScript files required for recording functionality -->
     <script src="/static/js/recorder-core.js"></script>
@@ -297,6 +352,25 @@
             return s;
         };
     </script>
+
+    <!-- Inline JavaScript code that handles the bottom collapsible logic -->
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight){
+              content.style.maxHeight = null;
+            } else {
+              content.style.maxHeight = content.scrollHeight + "px";
+            }
+          });
+        }
+    </script>
 </body>
+
 
 </html>
