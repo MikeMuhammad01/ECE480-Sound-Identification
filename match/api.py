@@ -20,7 +20,7 @@ def analyze_audio():
         result = match.match_recording(temp_file, folder_path)
         return result
     else:
-        return "failed！"
+        return "failed"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
