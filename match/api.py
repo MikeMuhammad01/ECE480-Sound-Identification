@@ -1,4 +1,5 @@
 import match
+import doppler_effect
 from scipy.io.wavfile import write
 from flask import Flask, render_template, request
 
@@ -12,13 +13,13 @@ def index():
 def analyze_audio():
     file = request.files.get("audio")
     temp_file = 'temp.wav'
+
     if file:
         file.save(temp_file)
+        match_result = match.match_recording(temp_file)
+        dB_result = doppler_effect.calculate_dB_level(temp_file)
 
-        # sound repository
-        folder_path = 'Sounds/'
-        result = match.match_recording(temp_file, folder_path)
-        return result
+        return [match_result, dB_result[0], dB_result[1]]
     else:
         return "failed"
 

@@ -13,7 +13,6 @@ from scipy.io import wavfile
 def extract_features(file_path):
     audio, fs = librosa.load(file_path)
     audio = nr.reduce_noise(y=audio, sr=fs)
-    print("Hi")
     return mfcc(y=audio, sr=fs)
 
 
@@ -23,17 +22,17 @@ def compute_similarity(features1, features2):
 
 def match_recording(recording_path):
     recording_features = extract_features(recording_path)
-    max_similarity = float('inf')
+    max_difference = float('inf')
     most_similar_file = None
 
     for file_name in os.listdir(repository_path):
         if file_name.endswith('.wav'):
             file_path = os.path.join(repository_path, file_name)
             file_features = extract_features(file_path)
-            similarity = compute_similarity(recording_features, file_features)
+            difference = compute_similarity(recording_features, file_features)
 
-            if similarity < max_similarity:
-                max_similarity = similarity
+            if difference < max_difference:
+                max_difference = difference
                 most_similar_file = file_name.replace('.wav', '')
 
     return most_similar_file
