@@ -332,6 +332,11 @@
             document.getElementById('button').style = "";
             // Hiding the "Stop Record" button by changing its CSS display property to 'none'
             document.getElementById('button2').style = "display: none";
+
+            document.getElementById('soundIdentified').innerHTML = "Recording stopped. Press the 'record' to begin Sound Identification!";
+            document.getElementById('decibelLevel').innerHTML = "Decibel Level (dB) Level will show here once sound is detected!";
+            document.getElementById('location').innerHTML = "We will tell you whether you are closer to the sound or further away from it!";
+
         }
 
         // A helper function to log messages to the browser console
@@ -343,17 +348,20 @@
         // This function updates the text content of the 'result' div to display messages to the user
         function displayResult(result) {
             // Setting the text content of the 'result' div to whatever result is passed to the function
-            let result2 = result.slice(1,-2)
-            result2 = result2.replace(/"/g,"")
-            let result3 = result2.split(',')
-            if (!(result == "Analyzing...")) {
-                document.getElementById('soundIdentified').innerHTML = "Sound Identified: " + result3[0];
-                document.getElementById('decibelLevel').innerHTML = "Decibel Level: " + result3[1]+" dB";
-                document.getElementById('location').innerHTML = "Relative Location: " + result3[2];
-            } else {
+            if (result != "Analyzing...") {
+                result = result.slice(1,-2)
+                result = result.replace(/"/g,"")
+                result = result.split(',')
+
+                document.getElementById('soundIdentified').innerHTML = "Sound Identified: " + result[0];
+                document.getElementById('decibelLevel').innerHTML = "Decibel Level: " + result[1] + " dB";
+                document.getElementById('location').innerHTML = "Relative Location: " + result[2];
+            }
+
+            else {
                 document.getElementById('soundIdentified').innerHTML = result;
-                document.getElementById('decibelLevel').innerHTML = "N/A";
-                document.getElementById('location').innerHTML = "N/A";
+                document.getElementById('decibelLevel').innerHTML = "Decibel Level (dB) Level will show here once sound is detected!";
+                document.getElementById('location').innerHTML = "We will tell you whether you are closer to the sound or further away from it!";
             }
 
             // Automatically open the collapsible when sound is detected
