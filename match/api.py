@@ -18,9 +18,9 @@ def analyze_audio():
         match_result = match.match_recording(temp_file)
         dB_result = doppler_effect.calculate_dB_level(temp_file)
 
-        return [match_result.replace('.wav', '') if match_result is not None else "No sound detected",
+        return [match_result.replace('.wav', '') if int(dB_result[0]) > 30 else "No sound matched",
                 int(dB_result[0]),
-                dB_result[1] if match_result is not None else "N/A"]
+                dB_result[1] if int(dB_result[0]) > 30 else "N/A"]
     else:
         return "failed"
 
