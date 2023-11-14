@@ -1,6 +1,5 @@
 import match
 import doppler_effect
-from scipy.io.wavfile import write
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -19,7 +18,9 @@ def analyze_audio():
         match_result = match.match_recording(temp_file)
         dB_result = doppler_effect.calculate_dB_level(temp_file)
 
-        return [match_result, dB_result[0], dB_result[1]]
+        return [match_result.replace('.wav', '') if match_result is not None else "No sound detected",
+                int(dB_result[0]),
+                dB_result[1] if match_result is not None else "N/A"]
     else:
         return "failed"
 

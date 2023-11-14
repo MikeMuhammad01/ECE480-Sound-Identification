@@ -1,13 +1,13 @@
 import math
+import statistics
 import os
 
 import librosa
-import sounddevice as sd
+import numpy
 import noisereduce as nr
 
 from dtw import dtw
 from librosa.feature import mfcc
-from scipy.io import wavfile
 
 
 def extract_features(file_path):
@@ -21,32 +21,31 @@ def compute_similarity(features1, features2):
 
 
 def match_recording(recording_path):
-    recording_features = extract_features(recording_path)
+    recording_features = numpy.split(extract_features(recording_path),
+                                     len(extract_features(recording_path))//2)
+
     max_difference = float('inf')
     most_similar_file = None
 
     for file_name in os.listdir(repository_path):
+
+        difference = []
+
         if file_name.endswith('.wav'):
             file_path = os.path.join(repository_path, file_name)
-            file_features = extract_features(file_path)
-            difference = compute_similarity(recording_features, file_features)
+            file_features = numpy.split(extract_features(file_path),
+                                        len(extract_features(file_path)) // 2)
 
-            if difference < max_difference:
-                max_difference = difference
-                most_similar_file = file_name.replace('.wav', '')
+            for i in range(0, len(recording_features)):
+                difference.append(compute_similarity(recording_features[i], file_features[i]))
+
+        avg_distance = statistics.mean(difference)
+
+        if avg_distance < max_difference:
+            max_difference = avg_distance
+            most_similar_file = file_name
 
     return most_similar_file
 
-
-def record_audio(file_path, duration):
-    fs = 44100  
-    print("recording...")
-    audio = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-    sd.wait()
-    wavfile.write(file_path, fs, audio)
-
-
-recording_duration = 5
-recording_file_path = 'recording.wav'
 repository_path = 'Sounds/'
 
