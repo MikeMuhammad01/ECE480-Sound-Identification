@@ -1,51 +1,42 @@
-import os, io
-import warnings
-import numpy as np
-import soundfile as sf
-from fastdtw import fastdtw
-from scipy.io import wavfile
-from python_speech_features import mfcc
+import math
+import os
 
-warnings.filterwarnings("ignore", category=wavfile.WavFileWarning)
+import librosa
+import noisereduce as nr
+
+from dtw import dtw
+from librosa.feature import mfcc
+
 
 def extract_features(file_path):
-    sample_rate, audio = wavfile.read(file_path)
-    features = mfcc(audio, sample_rate, nfft=2048)
-    return features
+    audio, fs = librosa.load(file_path)
+    audio = nr.reduce_noise(y=audio, sr=fs)
+    return mfcc(y=audio, sr=fs)
+
 
 def compute_similarity(features1, features2):
-    distance, _ = fastdtw(features1, features2)
-    similarity = 1 / (1 + distance)
-    return similarity
+    return dtw(x=features1.T, y=features2.T, dist=math.dist)[0]
 
-def match_recording(record_path, folder_path):
-    recording_features = extract_features(record_path)
-    max_similarity = -np.inf
+
+def match_recording(recording_path):
+    recording_features = extract_features(recording_path)
+
+    max_difference = float('inf')
     most_similar_file = None
 
-    for file_name in os.listdir(folder_path):
-        if file_name.endswith('.wav'):
-            print(file_name, end=': \t\t')
-            file_path = os.path.join(folder_path, file_name)
-            file_features = extract_features(file_path)
-            similarity = compute_similarity(recording_features, file_features)
-            print(similarity)
+    for file_name in os.listdir(repository_path):
 
-            if similarity > max_similarity:
-                max_similarity = similarity
+        if file_name.endswith('.wav'):
+            file_path = os.path.join(repository_path, file_name)
+            file_features = extract_features(file_path)
+
+            difference = compute_similarity(file_features, recording_features)
+
+            if difference < max_difference:
+                max_difference = difference
                 most_similar_file = file_name
 
     return most_similar_file
 
-def calculate_dB_level(audio_data_or_file_path):
-    if isinstance(audio_data_or_file_path, str):  # if it's a file path
-        sample_rate, audio_data = wavfile.read(audio_data_or_file_path)
-    else:  # assuming it's a numpy array
-        audio_data = audio_data_or_file_path
+repository_path = 'Sounds/'
 
-    amplitude = np.max(np.abs(audio_data))
-    if amplitude > 0:
-        dB_level = 20 * np.log10(amplitude)
-        return dB_level
-    else:
-        return -np.inf
