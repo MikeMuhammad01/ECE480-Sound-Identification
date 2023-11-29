@@ -178,7 +178,7 @@
                 rec = newRec;
                 reclog("Recording has been turned on. You can click Record to start recording.", 2);
             }, function (msg, isUserNotAllow) {//access refuse
-                reclog((isUserNotAllow ? "UserNotAllow，" : "") + "Failed to start recording:" + msg, 1);
+                reclog((isUserNotAllow ? "UserNotAllow," : "") + "Failed to start recording:" + msg, 1);
             });
         };
         recOpen()
