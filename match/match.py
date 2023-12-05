@@ -1,9 +1,7 @@
 import math
-import statistics
 import os
 
 import librosa
-import numpy
 import noisereduce as nr
 
 from dtw import dtw
@@ -21,29 +19,22 @@ def compute_similarity(features1, features2):
 
 
 def match_recording(recording_path):
-    recording_features = numpy.split(extract_features(recording_path),
-                                     len(extract_features(recording_path))//2)
+    recording_features = extract_features(recording_path)
 
     max_difference = float('inf')
     most_similar_file = None
 
     for file_name in os.listdir(repository_path):
 
-        difference = []
-
         if file_name.endswith('.wav'):
             file_path = os.path.join(repository_path, file_name)
-            file_features = numpy.split(extract_features(file_path),
-                                        len(extract_features(file_path)) // 2)
+            file_features = extract_features(file_path)
 
-            for i in range(0, len(recording_features)):
-                difference.append(compute_similarity(recording_features[i], file_features[i]))
+            difference = compute_similarity(file_features, recording_features)
 
-        avg_distance = statistics.mean(difference)
-
-        if avg_distance < max_difference:
-            max_difference = avg_distance
-            most_similar_file = file_name
+            if difference < max_difference:
+                max_difference = difference
+                most_similar_file = file_name
 
     return most_similar_file
 
