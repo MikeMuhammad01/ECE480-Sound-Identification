@@ -333,6 +333,7 @@
             // Hiding the "Stop Record" button by changing its CSS display property to 'none'
             document.getElementById('button2').style = "display: none";
 
+            // String values to display when recording has stopped
             document.getElementById('soundIdentified').innerHTML = "Recording stopped. Press the 'record' to begin Sound Identification!";
             document.getElementById('decibelLevel').innerHTML = "Decibel Level (dB) Level will show here once sound is detected!";
             document.getElementById('location').innerHTML = "We will tell you whether you are closer to the sound or further away from it!";
@@ -352,6 +353,7 @@
                 result = result.replace(/"/g,"")
                 result = result.split(',')
 
+                // String values to display when recording has began and results have been retrieved
                 document.getElementById('soundIdentified').innerHTML = "Sound Identified: " + result[0];
                 document.getElementById('decibelLevel').innerHTML = "Decibel Level: " + result[1] + " dB";
                 document.getElementById('location').innerHTML = "Relative Location: " + result[2];
