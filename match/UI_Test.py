@@ -3,13 +3,21 @@ from tkinter import font
 from threading import Thread
 import time
 
-from match import record_audio, match_recording, \
-    recording_duration, recording_file_path
-
+from match_test import record_audio, match_recording, recording_file
 from doppler_effect import calculate_dB_level
 
 
-# Define a Thread class to handle audio processing in the background
+#######################################################################
+#
+# ---------------------------------------------------------------------
+# Class: AudioProcessingThread(thread)
+# ---------------------------------------------------------------------
+# This Class defines an audio thread that can be created to ultimately
+# run the recording functionalities of the program. It invokes a
+# callback to 'update_ui' such that the user interface will display
+# newly obtained results from sound analysis and matching.
+#
+#######################################################################
 class AudioProcessingThread(Thread):
     def __init__(self, update_ui_callback):
         Thread.__init__(self)
@@ -20,8 +28,8 @@ class AudioProcessingThread(Thread):
         while True:  # Infinite loop to keep the thread running
             if self.running:
                 # If the thread is in the running state, record audio and find the most similar file
-                record_audio(recording_file_path, recording_duration)
-                most_similar_file = match_recording(recording_file_path)
+                record_audio()
+                most_similar_file = match_recording(recording_file)
                 self.update_ui_callback(most_similar_file)  # Update the UI with the result
                 time.sleep(0.5)  # Wait a half a second before the next iteration
             else:
@@ -34,7 +42,16 @@ class AudioProcessingThread(Thread):
         self.running = False  # Stop the audio processing
 
 
-# Function to update the UI with the most similar file and dB level (if enabled)
+#######################################################################
+#
+# ---------------------------------------------------------------------
+# Function update_ui(string)
+# ---------------------------------------------------------------------
+# This function takes in a string as input. It will update the ui with
+# the information corresponding to the sound that is most similar to
+# the recorded sound and display the results of the analysis.
+#
+#######################################################################
 def update_ui(most_similar_file):
 
     # Update the UI to show most similar file
@@ -42,7 +59,7 @@ def update_ui(most_similar_file):
 
     # Show the dB level on the UI
     if show_dB.get():
-        dB_level, position_to_sound = calculate_dB_level(recording_file_path)  # Calculate the dB level
+        dB_level, position_to_sound = calculate_dB_level(recording_file)  # Calculate the dB level
         dB_label.config(text=f'dB Level: {dB_level:.2f} dB')  # Update the dB level label
 
         # Make the UI display whether the sound is closer or further
@@ -54,7 +71,18 @@ def update_ui(most_similar_file):
         dB_comparison.config(text='')  # Clear the label if disabled
 
 
-# Function to handle button press events
+#######################################################################
+#
+# ---------------------------------------------------------------------
+# Function on_circle_press(event)
+# ---------------------------------------------------------------------
+# This function takes in user input (an event) as input. What this
+# function does depends on the current state of the sound analysis:
+#
+#       - Running: Start the audio thread so that it can record.
+#       - Not Running: Stop the audio thread from recording.
+#
+#######################################################################
 def on_circle_press(event):
     global running
     if not running:
