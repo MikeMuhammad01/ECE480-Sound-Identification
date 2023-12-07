@@ -22,7 +22,7 @@
             display: flex; /* Use flexbox for layout */
             flex-direction: column; /* Stack flex items vertically */
             align-items: center; /* Center-align items horizontally */
-            justify-content: space-around; /* Even spacing of children */
+            justify-content: space-between; /* Even spacing of children */
             height: 100vh; /* Full viewport height */
             font-family: Arial, sans-serif; /* Font style for the body */
             color: white;
@@ -44,8 +44,8 @@
 
         /* CSS styles for the title div */
         #title {
-            width: 90%; /* Take up 90% of the parent's width */
-            height: 100px; /* Fixed height */
+            width: 100%; /* Take up 100% of the parent's width */
+            height: 150px; /* Fixed height */
             border: 2px solid #333; /* Solid border with color */
             border-radius: 5px; /* Rounded corners */
             font-size: 24px; /* Text size */
@@ -333,6 +333,7 @@
             // Hiding the "Stop Record" button by changing its CSS display property to 'none'
             document.getElementById('button2').style = "display: none";
 
+            // String values to display when recording has stopped
             document.getElementById('soundIdentified').innerHTML = "Recording stopped. Press the 'record' to begin Sound Identification!";
             document.getElementById('decibelLevel').innerHTML = "Decibel Level (dB) Level will show here once sound is detected!";
             document.getElementById('location').innerHTML = "We will tell you whether you are closer to the sound or further away from it!";
@@ -352,6 +353,7 @@
                 result = result.replace(/"/g,"")
                 result = result.split(',')
 
+                // String values to display when recording has began and results have been retrieved
                 document.getElementById('soundIdentified').innerHTML = "Sound Identified: " + result[0];
                 document.getElementById('decibelLevel').innerHTML = "Decibel Level: " + result[1] + " dB";
                 document.getElementById('location').innerHTML = "Relative Location: " + result[2];
