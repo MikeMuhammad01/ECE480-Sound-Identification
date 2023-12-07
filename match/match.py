@@ -3,6 +3,7 @@ import os
 
 import librosa
 import noisereduce as nr
+import numpy as np
 
 from dtw import dtw
 from librosa.feature import mfcc
@@ -10,7 +11,11 @@ from librosa.feature import mfcc
 
 def extract_features(file_path):
     audio, fs = librosa.load(file_path)
-    audio = nr.reduce_noise(y=audio, sr=fs)
+
+    if np.isfinite(nr.reduce_noise(y=audio, sr=fs)).all():
+        audio = nr.reduce_noise(y=audio, sr=fs)
+        return mfcc(y=audio, sr=fs)
+
     return mfcc(y=audio, sr=fs)
 
 
