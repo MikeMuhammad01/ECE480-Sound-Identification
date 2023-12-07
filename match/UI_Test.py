@@ -28,7 +28,7 @@ class AudioProcessingThread(Thread):
         while True:  # Infinite loop to keep the thread running
             if self.running:
                 # If the thread is in the running state, record audio and find the most similar file
-                record_audio()
+                record_audio(5)
                 most_similar_file = match_recording(recording_file)
                 self.update_ui_callback(most_similar_file)  # Update the UI with the result
                 time.sleep(0.5)  # Wait a half a second before the next iteration
